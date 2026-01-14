@@ -1,5 +1,5 @@
 import os
-import shutil
+# import shutil
 import math
 import sys
 from enum import Enum
@@ -17,8 +17,9 @@ class Headers(Enum):
     PORTRAIT_OTHER_DPI = "Portrait Other DPI"
 
 # Pixel threshold
-HIGH_RESOLUTION = 1000
+# HIGH_RESOLUTION = 1000
 GALLERY_FOLDER_NAME = "gallery"
+IMAGES_TO_PROCESS_FOLDER_NAME = "images_to_process"
 TUMBNAIL_WIDTH = 600
 
 def get_image_info(image_path) -> tuple:
@@ -90,11 +91,11 @@ def create_thumbnail(file_path, width) -> Image:
         original_width, original_height = img.size
 
         if original_height < original_width:
-            # portrait image
+            # landscape image
             aspect_ratio = original_width / original_height
             height = int(width * aspect_ratio)
         else:
-            # Landscape image or square image
+            # Portait image or square image
             aspect_ratio = original_height / original_width
             height = int(width * aspect_ratio)
 
@@ -134,7 +135,7 @@ def copy_and_rename_images_in_subfolders(base_folder, target_folder) -> None:
                 print(f"Created thumbnail for {file_path} and saved to {new_file_path}")
                 image_serial_number += 1
 
-def count_images_by_category(base_folder) -> dict:
+def count_images_by_category(source_folder) -> dict:
     """Counts the number of images in the base folder by category.
 
     Args:
@@ -150,7 +151,7 @@ def count_images_by_category(base_folder) -> dict:
     portrait_low_dpi = 0
     portrait_other_dpi = 0
 
-    for root, dirs, files in os.walk(base_folder):
+    for root, dirs, files in os.walk(source_folder):
         if GALLERY_FOLDER_NAME in dirs:
             dirs.remove(GALLERY_FOLDER_NAME)  # Exclude the gallery folder from the search
 
@@ -190,7 +191,7 @@ def create_image_gallery(target_folder):
         target_folder (str): Path to the target folder.
     """
 
-    print_vote_box = input("Do you want to create an Image Gallery? (y/N): ").strip().upper()
+    print_vote_box = input("Do you want to wrint a Vote box under each image? (y/N): ").strip().upper()
 
     if print_vote_box == "":
         print_vote_box = False
@@ -222,11 +223,12 @@ def create_image_gallery(target_folder):
     """
     images = [f for f in os.listdir(target_folder) if f.lower().endswith(('72.jpg', '72.jpeg'))]
 
-    for image in images:    
+    for image in images:
         # Split up images in big or smaller photos
         low_html_content += f'''
             <div class="image">
-            <img src="{os.path.join(target_folder, image)}" alt="{image}" title="{image}">
+            <!-- <img src="{os.path.join(target_folder, image)}" alt="{image}" title="{image}"> //-->
+            <img src="./{image}" alt="{image}" title="{image}">
             <p>Image nr # {image[:image.find('-')] if '-' in image else image}</p>
         '''
         if print_vote_box:
@@ -236,11 +238,12 @@ def create_image_gallery(target_folder):
 
     images = [f for f in os.listdir(target_folder) if f.lower().endswith(('96.jpg', '96.jpeg'))]
 
-    for image in images:    
+    for image in images:
         # Split up images in big or smaller photos
         low_html_content += f'''
             <div class="image">
-            <img src="{os.path.join(target_folder, image)}" alt="{image}" title="{image}">
+            <!-- <img src="{os.path.join(target_folder, image)}" alt="{image}" title="{image}"> //-->
+            <img src="./{image}" alt="{image}" title="{image}">
             <p>Image nr # {image[:image.find('-')] if '-' in image else image}</p>
         '''
 
@@ -254,10 +257,10 @@ def create_image_gallery(target_folder):
         # Split up images in big or smaller photos
         high_html_content += f'''
             <div class="image">
-            <img src="{os.path.join(target_folder, image)}" alt="{image}" title="{image}">
+            <!-- <img src="{os.path.join(target_folder, image)}" alt="{image}" title="{image}"> //-->
+            <img src="./{image}" alt="{image}" title="{image}">
             <p>Image nr # {image[:image.find('-')] if '-' in image else image}</p>
             <p></p>
-            </div>
         '''
         if print_vote_box:
             high_html_content += '<div class="rectangle"><div class="rectangletext">VOTE HERE</div></div></div>'
@@ -277,9 +280,10 @@ def create_image_gallery(target_folder):
 def main():
     """Main function to run the program."""
     base_folder = os.path.dirname(os.path.abspath(__file__))
+    source_folder = os.path.join(base_folder, IMAGES_TO_PROCESS_FOLDER_NAME)
     target_folder = os.path.join(base_folder, GALLERY_FOLDER_NAME)
 
-    statistics = count_images_by_category(base_folder)
+    statistics = count_images_by_category(source_folder)
     print("Images have been counted by category")
 
     for key, value in statistics.items():
@@ -293,7 +297,7 @@ def main():
 
     if response == "Y":
         print("Thumbnails and Image Gallery HTML will be created")
-        copy_and_rename_images_in_subfolders(base_folder, target_folder)
+        copy_and_rename_images_in_subfolders(source_folder, target_folder)
         create_image_gallery(target_folder)
         print("Image copying, renaming, and gallery creation completed.")
     elif response == "N":

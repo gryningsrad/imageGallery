@@ -1,3 +1,6 @@
+/images_to_process
+!.gitignore
+!README.md
 *.pdf
 *.xlsx
 *.zip

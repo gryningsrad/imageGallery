@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "image-gallery-generator"
+version = "0.1.0"
+description = "Generate thumbnails and an optional HTML image gallery from JPG/JPEG images in subfolders."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Mikael Mattsson",
+    email = "gryningsrad.mm@gmail.com",
+  }
+]
+keywords = ["images", "gallery", "thumbnails", "pillow", "html"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+dependencies = [
+  "Pillow>=10.0",
+]
+
+[project.urls]
+Homepage = "https://www.gryningsrad.se"
+Repository = "https://github.com/gryningsrad/imageGallery"
+Issues = "https://github.com/gryningsrad/imageGallery/issues"
+
+[project.scripts]
+image-gallery = "image_gallery:main"
+
+[tool.setuptools]
+py-modules = ["gallery_generator"]
+
+[tool.setuptools.package-data]
+# If you later ship a default styles.css inside a package, you'd include it here.
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]

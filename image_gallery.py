@@ -146,10 +146,8 @@ def count_images_by_category(source_folder) -> dict:
     """
     landscape_high_dpi = 0
     landscape_low_dpi = 0
-    landscape_other_dpi = 0
     portrait_high_dpi = 0
     portrait_low_dpi = 0
-    portrait_other_dpi = 0
 
     for root, dirs, files in os.walk(source_folder):
         if GALLERY_FOLDER_NAME in dirs:
@@ -161,27 +159,21 @@ def count_images_by_category(source_folder) -> dict:
                 width, height, dpi = get_image_info(file_path)
 
                 if width > height:  # Landscape orientation
-                    if dpi > 250:
+                    if dpi >= 250:
                         landscape_high_dpi += 1
-                    elif dpi < 100:
+                    else:
                         landscape_low_dpi += 1
-                    else:
-                        landscape_other_dpi += 1
                 else:  # Portrait orientation
-                    if dpi > 250:
+                    if dpi >= 250:
                         portrait_high_dpi += 1
-                    elif dpi < 250:
-                        portrait_low_dpi += 1
                     else:
-                        portrait_other_dpi += 1
+                        portrait_low_dpi += 1
 
     return {
         "landscape_high_dpi": landscape_high_dpi,
         "landscape_low_dpi": landscape_low_dpi,
-        "landscape_other_dpi": landscape_other_dpi,
         "portrait_high_dpi": portrait_high_dpi,
         "portrait_low_dpi": portrait_low_dpi,
-        "portrait_other_dpi": portrait_other_dpi
     }
 
 def create_image_gallery(target_folder):
@@ -198,9 +190,6 @@ def create_image_gallery(target_folder):
 
     if print_vote_box == "Y":
         print_vote_box = True
-
-    # Else
-    printVoteBox = False
 
     images = [f for f in os.listdir(target_folder) if f.lower().endswith(('.jpg', '.jpeg'))]
     html_content = """

@@ -1,5 +1,5 @@
-/images_to_process
-/gallery
+images_to_process/
+gallery/
 !.gitignore
 !README.md
 *.pdf

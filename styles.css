@@ -45,12 +45,12 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  .rectangletext {   
+}
+.rectangletext {   
     color: rgb(139, 139, 139);
     font-size: 40px;
-  }
-  .pagebreak {
+}
+.pagebreak {
      /* page-break-after: always; */
     page-break-after: always;
-  }
+}

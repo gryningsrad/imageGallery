@@ -1,39 +1,178 @@
-# Image Thumbnail Gallery Generator
+# Image Gallery & Photo Vote Generator
 
-A small Python script that scans all subfolders under the script directory for `.jpg/.jpeg` images, generates **thumbnails**, and writes a simple **HTML gallery** to browse them.
+A Python CLI tool that scans image folders, generates **print-friendly thumbnails**, and produces a **photo voting sheet** as a single HTML file.  
+Designed for situations where images and vote boxes must appear **together on printed pages**, with controlled page breaks.
 
-It also prints basic statistics about the images (landscape/portrait + DPI categories).
+Typical use cases:
 
-## What it does
+- Photo competitions
+- Jury or committee voting
+- Classroom or club photo reviews
+- Offline / paper-based voting
 
-- Recursively searches for `.jpg` / `.jpeg` under the folder where the script lives
-- Skips the output folder named `gallery/` to avoid re-processing generated files
-- For every image found:
-  - Reads width/height and DPI metadata (defaults to 72 if missing)
-  - Corrects image orientation using EXIF `Orientation` tag (if present)
-  - Generates a thumbnail (default width: `600px`, height scaled by aspect ratio)
-  - Saves the thumbnail into `./gallery/` with a renamed filename that includes:
-    - a running serial number
-    - the source subfolder name
-    - original filename
-    - `WIDTHxHEIGHT@DPI`
+---
 
-- Optionally generates `gallery/ImageGallery.html` that lists images (grouped by DPI suffix in filename)
+## Features
+
+- Recursively scans folders for images
+- Generates **JPEG thumbnails** with EXIF orientation applied
+- Safe, sanitized filenames with metadata (`WxH@DPI`)
+- Prints **image statistics** (portrait/landscape + DPI buckets)
+- Generates a **print-optimized HTML vote sheet**
+- Forces **page breaks after every 4 images** when printing
+- Portable output (relative paths, inline CSS)
+- Non-interactive CLI (automation-friendly)
+
+---
 
 ## Requirements
 
-- Python 3.10+ recommended
-- Pillow (PIL)
+- Python **3.11+**
+- Pillow
+
+All dependencies are declared in `pyproject.toml`.
+
+---
 
 ## Installation
 
-Create a virtual environment and install dependencies:
+### Clone the repository
 
-```bash
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
+    git clone https://github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO>.git
+    cd <YOUR_REPO>
 
-pip install pillow
+## Create and activate a virtual environment
+
+    python -m venv .venv
+## Windows
+
+    .venv\Scripts\activate
+## macOS / Linux
+
+    source .venv/bin/activate
+
+## Install the project (editable mode recommended)
+
+    python -m pip install -e .
+
+This installs the CLI command:
+    image-gallery
+
+## basic usage
+
+### Generate thumbnails only
+
+    python gallery_generator.py
+
+### or, if installed as a CLI
+
+    image-gallery
+
+### This
+
+scans the input folder
+generates thumbnails in ./gallery/
+prints image statistics
+does not generate HTML
+
+## Generate a Photo Vote HTML Sheet (recommended)
+
+    image-gallery --html --vote-box --skip-existing
+
+### This will
+
+generate thumbnails
+create gallery/ImageGallery.html
+include a vote box under every image
+insert a page break after every 4 images when printing
+
+Open ImageGallery.html in a browser and print.
+
+## Common Options
+
+### Set thumbnail width
+
+    image-gallery --thumb-width 800
+
+### Scan a specific input folder
+
+    image-gallery --input "C:\Photos\Contest"
+
+### Choose output folder
+
+    image-gallery --output "C:\Photos\Contest\gallery"
+
+### Skip already-generated thumbnails
+
+    image-gallery --skip-existing
+
+### Limit processing (useful for testing)
+
+    image-gallery --max-images 10
+
+### Include additional file types
+
+    image-gallery --extensions .jpg,.jpeg,.png
+
+## Print Layout Behavior (Important)
+
+Images are displayed in a 2-column grid
+Each image + vote box is treated as a single “card”
+CSS rules ensure:
+
+- cards are never split across pages
+- page breaks occur after every 4 cards
+- Implemented using:
+- break-after: page
+- break-inside: avoid
+
+This makes the output reliable for real-world printing.
+
+## Output Structure
+
+project/
+  gallery_generator.py
+  pyproject.toml
+  README.md
+  gallery/
+    001-Subfolder-image-4000x3000@300.jpg
+    002-Subfolder-image-3000x4000@72.jpg
+    ImageGallery.html
+
+The HTML file references images using relative paths and is fully portable.
+
+## Image Statistics
+
+Before generating thumbnails, the script prints counts for:
+
+- Landscape / Portrait
+- High DPI (>250)
+- Low DPI (<250)
+- Other (=250)
+
+Note: DPI metadata is often unreliable; these statistics are informational only.
+
+## CLI Reference
+
+### Argument Description
+
+    --input PATH  // Folder to scan (default: script folder)
+    --output PATH // Output folder (default: gallery)
+    --thumb-width N // Thumbnail width in pixels
+    --extensions .a,.b // File extensions to include
+    --skip-existing // Skip thumbnails that already exist
+    --max-images N // Process at most N images
+    --html // Generate ImageGallery.html
+    --vote-box // Include vote boxes in HTML
+    --log-level LEVEL // DEBUG / INFO / WARNING / ERROR
+
+## Notes & Design Decisions
+
+- Thumbnails are always saved as JPEG for consistency
+- EXIF orientation is applied before resizing
+- Filenames are sanitized to be filesystem- and browser-safe
+- HTML uses inline CSS to avoid external dependencies
+- Designed for offline and print-first workflows
+
+## License
+MIT License.
